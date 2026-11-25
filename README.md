@@ -72,6 +72,7 @@ The six concepts where business logic and engineering implementation most freque
 | 04 | Attribution Window | Conversion pixel timing; post-click vs. post-view logic; long consideration cycles | 📋 Planned |
 | 05 | Clean Rooms and PETs | Differential privacy; k-anonymity; query logging; privacy-preserving computation | 📋 Planned |
 | 06 | SLA and Uptime Guarantees | Error budgets; circuit breakers; graceful degradation; contract-level implications | 📋 Planned |
+| 07 | Traditional OOH Buying Workflow| Avails normalization; RFP intake parsing; rate card digitization; IO-to-billing reconciliation; proof of posting verification| ✅ Published|
 
 **Format for each artifact:**
 
