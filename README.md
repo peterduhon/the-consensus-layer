@@ -14,6 +14,8 @@ This is not a criticism of engineers. It is a structural diagnosis. CTV and DOOH
 
 The Consensus Layer addresses this by making the implicit explicit: the business logic that product managers carry in their heads, written down in a form that engineers can read, reference, and apply at the point of decision.
 
+The pattern extends to traditional out-of-home, where the translation gap runs deepest. A market measured in tens of billions of dollars still transacts on emailed RFPs, avails spreadsheets, PDF rate cards, and phone-call negotiation, with proof of performance arriving as photographs taken from a sidewalk. Engineers hired to automate these workflows typically arrive from digital advertising, where impression-level data and real-time auctions are the default. Traditional OOH has neither. The result is the same class of failure described above, amplified: systems built to digitize the workflow without understanding why the workflow exists.
+
 **It is not training material.** It is a decision reference: the document you send before a schema discussion, the framework you use to scope a feature, the shared vocabulary that makes the first meeting shorter.
 
 ---
