@@ -1,0 +1,93 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 ArialMT;\f2\froman\fcharset0 Times-Roman;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww33400\viewh19380\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # 07: Traditional OOH Buying Workflow\
+\
+How a $20 billion market still runs on spreadsheets, and what breaks when you automate it without understanding why it works the way it does.\
+\
+## The Business Problem\
+\
+Traditional out-of-home (billboards, transit, place-based media) is bought through a direct, relationship-driven workflow that has remained structurally unchanged for decades. An agency planner issues RFPs to multiple media owners by email. Each owner responds with an availability response ("avails") in its own format, usually Excel or PDF, with pricing taken from a static rate card and then negotiated by phone. The planner consolidates responses manually, builds a client proposal by hand, and books the campaign through a signed insertion order sent as a PDF attachment. Proof of performance is a photograph of the posted unit, taken by field staff and emailed weeks later.\
+\
+Every stage of this workflow is a handoff between two systems that do not share a schema. The commercial consequence is not inconvenience; it is cycle time measured in weeks, billing discrepancies that surface at invoice time as credit requests, and media owners with no visibility into how their inventory is priced relative to the market.\
+\
+## What Engineers Think (and Why, Given Their Prior Context)\
+\
+Engineers arriving from digital advertising see a workflow that looks like a solved problem. Digital media has programmatic pipes, impression-level logs, and standardized request/response formats (OpenRTB). The natural instinct is to treat traditional OOH as digital media with worse tooling: expose the inventory as an API, attach an auction, and the market will modernize itself.\
+\
+This instinct fails because it misreads what the inventory is. A static billboard cannot participate in a real-time auction. There is no impression event, no per-viewer identity, and no impression-level log. Audience is estimated at the unit level through ratings bodies (Geopath in the US) that publish opportunity-to-see figures derived from traffic patterns, not from observed exposure. The unit of sale is a share of time or a posting period, not an impression.\
+\
+## What the Business Actually Needs\
+\
+The business need is sequencing, not auction mechanics:\
+\
+1. **Digitize the workflow first.** Avails, rate cards, insertion orders, and proof of posting must become structured data before any transaction layer can sit on top of them. The revenue already lives in this workflow; automating it poorly puts existing spend at risk.\
+2. **Normalize inventory across owners.** Each media owner describes its units differently. A canonical inventory schema, with audience measurement joined at the unit level, is the substrate every later capability depends on.\
+3. **Connect digital inventory to programmatic demand selectively.** Only digital screens can transact programmatically, and in practice this market runs on programmatic guaranteed and private marketplace deals, not open auctions. Deal IDs, inventory forecasting, and publisher-approved creative workflows are the gating plumbing.\
+4. **Protect the direct channel.** The agencies and owners who use these platforms chose them precisely because they digitize the manual workflow without disrupting it. Automation that threatens the relationship-driven sales model will be rejected by the customer base the platform depends on.\
+\
+## Technical Implementation\
+\
+The core technical work is normalization and reconciliation, not auction engineering:\
+\
+```sql\
+-- Reconcile booked units against verified posting evidence.\
+-- Unreconciled rows become credit requests at invoice time.\
+SELECT\
+    io.line_item_id,\
+    io.unit_id,\
+    io.booked_cost,\
+    pop.verified_at,\
+    CASE\
+        WHEN pop.verified_at IS NULL THEN 'no_proof'\
+        WHEN pop.verified_at &gt; io.flight_end THEN 'late_proof'\
+        ELSE 'verified'\
+    END AS reconciliation_status\
+FROM insertion_order_lines io\
+LEFT JOIN proof_of_posting pop\
+    ON io.unit_id = pop.unit_id\
+    AND pop.photo_date BETWEEN io.flight_start AND io.flight_end;\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf0 \expnd0\expndtw0\kerning0
+```
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 Rate card digitization means converting static PDF pricing into a rules table (market tier, unit format, seasonality, occupancy) that a pricing engine can query, with negotiated overrides preserved as first-class data rather than scattered across email threads.
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 ## Failure Mode
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 A platform team builds an avails API without normalizing the response format across media owners. Agency planners receive structured data they still cannot compare, so they export it to Excel and continue the manual consolidation. The platform reports "API adoption" while the actual workflow, and the revenue, continues to run on spreadsheets. Six months later, leadership concludes that agencies "resist automation," when in fact the automation never reached the decision point.
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 The mirror-image failure: a team commits to real-time bidding for digital screens before digitizing insertion orders and proof of posting. Programmatic revenue arrives on top of an unreconciled billing base, and every programmatic buy inherits the manual workflow's discrepancy rate. The advertiser applies a discount to all future buys.
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 ## Translation Conversation: Product and Engineering
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 In 60 seconds: "This market cannot do real-time bidding on most of its inventory, because most of its inventory is vinyl. Our job is to digitize the workflow where the revenue already lives: avails, rate cards, IOs, proof of posting. Then we connect the digital minority of screens to programmatic demand through guaranteed deals, not open auctions. The order matters. Automating the wrong layer first means we spend a year building an auction nobody can use while the billing discrepancies keep eating the margin."
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 ## Open-Source Implementation
+\f2\fs24 \
+\
+
+\f1\fs29\fsmilli14667 The reconciliation pattern above connects to the data quality and lineage work in the portfolio repositories: payload mismatch auditing across system boundaries (see Ad Tech SQL Analysis) is the same failure class as IO-to-proof-of-posting reconciliation, with an invoice attached. The pricing rules table is the direct antecedent of the floor-price logic in BidOptimizerPro; a negotiated rate card and a programmatic floor are the same control at different points in a market's maturity.
+\f2\fs24 \
+}
