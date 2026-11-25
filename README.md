@@ -67,7 +67,7 @@ The six concepts where business logic and engineering implementation most freque
 | # | Concept | Technical Focus | Status |
 |---|---------|-----------------|--------|
 | 01 | [First-Price vs. Second-Price Auction](./chapter-1-adtech-translation/01-first-price-second-price.md) | Bid shading; floor price optimization; log schema price fields | ✅ Published |
-| 02 | [Viewability (MRC / IAS / MOAT)](./chapter-1-adtech-translation/02-viewability.md) | Pixel firing; viewport detection; SSAI completion beacons; DOOH OTS | ✅ Published |
+| 02 | [Viewability (MRC / IAS / MOAT)](./chapter-1-adtech-translation/02%20viewability.md) | Pixel firing; viewport detection; SSAI completion beacons; DOOH OTS | ✅ Published |
 | 03 | Frequency Capping | User/device graph deduplication; cross-device session management; household-level caps | 🔄 In progress |
 | 04 | Attribution Window | Conversion pixel timing; post-click vs. post-view logic; long consideration cycles | 📋 Planned |
 | 05 | Clean Rooms and PETs | Differential privacy; k-anonymity; query logging; privacy-preserving computation | 📋 Planned |
